@@ -2,6 +2,7 @@ package com.techvelen.calldetail.anycall.numbers.allhistory;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     Button btn_1;
     Button btn_6;
     Button btn_12;
+    TextView txtActive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         btn_1 = findViewById(R.id.btn_1);
         btn_6 = findViewById(R.id.btn_6);
         btn_12 = findViewById(R.id.btn_12);
+        txtActive = findViewById(R.id.txtActive);
     }
 
     private void initInAppBilling() {
@@ -51,13 +54,38 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     setBillingData();
+                    getActiveSubscription();
                 }
             }
 
             @Override
             public void onBillingServiceDisconnected() {
+                billingClient.startConnection(this);
             }
         });
+    }
+
+    private void getActiveSubscription() {
+        billingClient.queryPurchasesAsync(BillingClient.SkuType.SUBS, (billingResult, list) -> {
+            runOnUiThread(() -> setData(list));
+        });
+    }
+
+    public void setData(List<Purchase> list) {
+        List<String> skuList = new ArrayList<>();
+        skuList.add("subbronze_1");
+        skuList.add("subsilver_6");
+        skuList.add("subgold_12");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Active Plans");
+        stringBuilder.append("\n\n");
+        for (Purchase purchase : list) {
+            if (purchase.isAutoRenewing() && skuList.contains(purchase.getSkus().get(0))) {
+                stringBuilder.append(purchase.getSkus().get(0));
+                stringBuilder.append("\n");
+            }
+            txtActive.setText(stringBuilder.toString());
+        }
     }
 
     @Override
