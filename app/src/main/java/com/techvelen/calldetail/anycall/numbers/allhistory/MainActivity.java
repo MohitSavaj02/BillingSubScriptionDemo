@@ -1,7 +1,6 @@
 package com.techvelen.calldetail.anycall.numbers.allhistory;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                Log.e("The_Wolf", "onBillingSetupFinished: " + billingResult.getResponseCode());
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     setBillingData();
                 }
@@ -58,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
             @Override
             public void onBillingServiceDisconnected() {
-                Log.e("The_Wolf", "onBillingServiceDisconnected: ");
             }
         });
     }
