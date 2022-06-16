@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     Button btn_6;
     Button btn_12;
     TextView txtActive;
+    ArrayList<SkuDetails> skuDataList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,40 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         btn_6 = findViewById(R.id.btn_6);
         btn_12 = findViewById(R.id.btn_12);
         txtActive = findViewById(R.id.txtActive);
+
+
+        btn_1.setOnClickListener(v -> {
+            SkuDetails sku = null;
+            for (SkuDetails skuDetails : skuDataList) {
+                if (skuDetails.getSku().equals("subbronze_1")) {
+                    sku = skuDetails;
+                }
+            }
+            launchBilling(sku);
+
+        });
+
+        btn_6.setOnClickListener(v -> {
+            SkuDetails sku = null;
+            for (SkuDetails skuDetails : skuDataList) {
+                if (skuDetails.getSku().equals("subsilver_6")) {
+                    sku = skuDetails;
+                }
+            }
+            launchBilling(sku);
+
+        });
+
+        btn_12.setOnClickListener(v -> {
+            SkuDetails sku = null;
+            for (SkuDetails skuDetails : skuDataList) {
+                if (skuDetails.getSku().equals("subgold_12")) {
+                    sku = skuDetails;
+                }
+            }
+            launchBilling(sku);
+
+        });
     }
 
     private void initInAppBilling() {
@@ -125,25 +160,22 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
         params.setSkusList(skuList).setType(BillingClient.SkuType.SUBS);
         billingClient.querySkuDetailsAsync(params.build(), (billingResult, skuDetailsList) -> {
+            skuDataList.clear();
             if (skuDetailsList != null && skuDetailsList.size() > 0) {
-                for (SkuDetails skuDetails : skuDetailsList) {
-                    if (skuDetails.getSku().equals("subbronze_1")) {
-                        btn_1.setOnClickListener(v -> {
-                            launchBilling(skuDetails);
-                        });
-                    } else if (skuDetails.getSku().equals("subsilver_6")) {
-                        btn_6.setOnClickListener(v -> {
-                            launchBilling(skuDetails);
-                        });
-
-                    } else if (skuDetails.getSku().equals("subgold_12")) {
-                        btn_12.setOnClickListener(v -> {
-                            launchBilling(skuDetails);
-                        });
+                runOnUiThread(() -> {
+                    for (SkuDetails skuDetails : skuDetailsList) {
+                        skuDataList.add(skuDetails);
                     }
-                }
+                    setButtonData(skuDataList);
+                });
             }
         });
+    }
+
+    private void setButtonData(ArrayList<SkuDetails> skuDataList) {
+        btn_1.setText(skuDataList.get(0).getPrice());
+        btn_6.setText(skuDataList.get(1).getPrice());
+        btn_12.setText(skuDataList.get(2).getPrice());
     }
 
     public void launchBilling(SkuDetails skuDetails) {
