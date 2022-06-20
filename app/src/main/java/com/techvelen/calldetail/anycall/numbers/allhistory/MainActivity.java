@@ -1,6 +1,7 @@
 package com.techvelen.calldetail.anycall.numbers.allhistory;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,8 +35,12 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initInAppBilling();
-        initView();
+        runOnUiThread(() -> {
+            new Handler().postDelayed(() -> {
+                initInAppBilling();
+                initView();
+            }, 1000);
+        });
     }
 
     private void initView() {
@@ -44,11 +49,10 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         btn_12 = findViewById(R.id.btn_12);
         txtActive = findViewById(R.id.txtActive);
 
-
         btn_1.setOnClickListener(v -> {
             SkuDetails sku = null;
             for (SkuDetails skuDetails : skuDataList) {
-                if (skuDetails.getSku().equals("subbronze_1")) {
+                if (skuDetails.getSku().equals("weekly")) {
                     sku = skuDetails;
                 }
             }
@@ -59,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         btn_6.setOnClickListener(v -> {
             SkuDetails sku = null;
             for (SkuDetails skuDetails : skuDataList) {
-                if (skuDetails.getSku().equals("subsilver_6")) {
+                if (skuDetails.getSku().equals("monthly")) {
                     sku = skuDetails;
                 }
             }
@@ -70,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         btn_12.setOnClickListener(v -> {
             SkuDetails sku = null;
             for (SkuDetails skuDetails : skuDataList) {
-                if (skuDetails.getSku().equals("subgold_12")) {
+                if (skuDetails.getSku().equals("yearly")) {
                     sku = skuDetails;
                 }
             }
@@ -108,9 +112,9 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
     public void setData(List<Purchase> list) {
         List<String> skuList = new ArrayList<>();
-        skuList.add("subbronze_1");
-        skuList.add("subsilver_6");
-        skuList.add("subgold_12");
+        skuList.add("weekly");
+        skuList.add("monthly");
+        skuList.add("yearly");
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Active Plans");
         stringBuilder.append("\n\n");
@@ -154,9 +158,9 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
     private void setBillingData() {
         List<String> skuList = new ArrayList<>();
-        skuList.add("subbronze_1");
-        skuList.add("subsilver_6");
-        skuList.add("subgold_12");
+        skuList.add("weekly");
+        skuList.add("monthly");
+        skuList.add("yearly");
         SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
         params.setSkusList(skuList).setType(BillingClient.SkuType.SUBS);
         billingClient.querySkuDetailsAsync(params.build(), (billingResult, skuDetailsList) -> {
